@@ -1,7 +1,7 @@
 import { Message, Client } from 'discord.js'
 import { prefix } from '../utils'
 
-module.exports = (client: Client, message: Message) => {
+export default (client: Client, message: Message) => {
 
     if (!message.content.startsWith(prefix) || message.author.bot) return
 

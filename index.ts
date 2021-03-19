@@ -15,7 +15,7 @@ readdir(`${__dirname}/events`, (err, files) => {
 		if (fileArr[1] == 'js' && fileArr[2] == 'map') return
 		const event = require(`./events/${file}`)
 		const eventName = fileArr[0]
-		client.on(eventName, event.bind(null, client))
+		client.on(eventName, event.default.bind(null, client))
 	})
 })
 
