@@ -16,7 +16,7 @@ export const execute = async (client: Client, message: Message, args: string[]) 
             },
             media: {
                 mimeType: 'image/jpg',
-                body: createReadStream(path.join('/home/roshan/Projects/discord-gdrive-bot', 'obama.jpg'))
+                body: createReadStream(path.join(__dirname, 'obama.jpg'))
             }
         })
         console.log(res.data)
