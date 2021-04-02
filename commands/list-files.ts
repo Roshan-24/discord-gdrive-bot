@@ -11,7 +11,7 @@ export const execute = async (client: Client, message: Message) => {
         fields: 'nextPageToken, files(id, name)',
     },
     (err, res) => {
-        if (err) return console.log('The API returned an error: ' + err);
+        if (err) return message.channel.send('The API returned an error: ' + err);
         const files = res.data.files;
         if (files.length) {
             message.channel.send('Files:');
