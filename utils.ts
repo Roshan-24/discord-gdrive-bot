@@ -8,7 +8,7 @@ dotenv.config()
 export const authToken = process.env.BOT_TOKEN
 export const prefix = '!'
 export const TOKEN_PATH = 'tokens.json'
-export const SCOPES = ['https://www.googleapis.com/auth/drive'];
+export const SCOPES = ['https://www.googleapis.com/auth/drive']
 
 export const getOAuth2Client = async (user: User) => {
     const content = await readFile('credentials.json').catch(err => console.log(err))
