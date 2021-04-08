@@ -10,17 +10,23 @@ export const execute = async (client: Client, message: Message) => {
 		return
 	}
 	
-	if (await checkInit(message.channel.id)) {
-		message.channel.send('You have already enabled drive integration for this channel!')
-		return
-	}
-
-	const oAuth2Client = await getOAuth2Client(message.channel.id)
+	try {
+		if (await checkInit(message.channel.id)) {
+			message.channel.send('You have already enabled drive integration for this channel!')
+			return
+		}
 	
-	const authUrl = oAuth2Client.generateAuthUrl({
-		access_type: 'offline',
-		scope: SCOPES,
-	});
-	message.channel.send("Check your DMs!")
-	message.author.send(`You have initiated drive integration for channel id ${message.channel.id}. Authorize the bot by visiting this url: ${authUrl} and copy the access code and reply back in this format - '!auth-token <channel-id> <token>' (without the brackets). Caution: Don't share your access token with others`);
+		const oAuth2Client = await getOAuth2Client(message.channel.id)
+		
+		const authUrl = oAuth2Client.generateAuthUrl({
+			access_type: 'offline',
+			scope: SCOPES,
+		})
+		message.channel.send("Check your DMs!")
+		message.author.send(`You have initiated drive integration for channel id ${message.channel.id}. Authorize the bot by visiting this url: ${authUrl} and copy the access code and reply back in this format - '!auth-token <channel-id> <token>' (without the brackets). Caution: Don't share your access token with others`);
+	} 
+	catch (err) {
+		message.channel.send('Something went wrong...')
+		console.log(err)
+	}
 }
