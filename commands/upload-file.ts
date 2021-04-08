@@ -6,7 +6,7 @@ import path from 'path'
 
 export const name = 'upload-file'
 export const execute = async (client: Client, message: Message, args: string[]) => {
-    const auth = await getOAuth2Client(message.author)
+    const auth = await getOAuth2Client(message.channel.id)
     const drive = google.drive({version: 'v3', auth});
     try {
         const res = await drive.files.create({
@@ -16,7 +16,7 @@ export const execute = async (client: Client, message: Message, args: string[]) 
             },
             media: {
                 mimeType: 'image/jpg',
-                body: createReadStream(path.join(__dirname, 'obama.jpg'))
+                body: createReadStream(path.join(__dirname, '../../obama.jpg'))
             }
         })
         console.log(res.data)

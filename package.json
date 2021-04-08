@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -x ts-node --files index.ts",
+    "dev": "nodemon --ignore tokens.json -x ts-node --files index.ts",
     "postinstall": "tsc",
     "start": "node dist/index.js"
   },

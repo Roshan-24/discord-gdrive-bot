@@ -4,7 +4,7 @@ import { getOAuth2Client } from "../utils";
 
 export const name = 'list-files'
 export const execute = async (client: Client, message: Message) => {
-    const auth = await getOAuth2Client(message.author)
+    const auth = await getOAuth2Client(message.channel.id)
     const drive = google.drive({version: 'v3', auth});
     drive.files.list({
         pageSize: 10,

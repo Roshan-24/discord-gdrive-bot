@@ -1,6 +1,6 @@
-import { User } from 'discord.js'
+import { User, WebhookClient } from 'discord.js'
 import dotenv from 'dotenv'
-import { readFile } from 'fs/promises'
+import { readFile, writeFile } from 'fs/promises'
 import { google } from 'googleapis'
 
 dotenv.config()
@@ -10,25 +10,43 @@ export const prefix = '!'
 export const TOKEN_PATH = 'tokens.json'
 export const SCOPES = ['https://www.googleapis.com/auth/drive']
 
-export const getOAuth2Client = async (user: User) => {
-    const content = await readFile('credentials.json').catch(err => console.log(err))
-    if (!Buffer.isBuffer(content)) return null
-    const {
-        client_secret,
-        client_id,
-        redirect_uris,
-    } = JSON.parse(content.toString()).installed;
+export const getOAuth2Client = async (channelId: string) => {
     const oAuth2Client = new google.auth.OAuth2(
-        client_id,
-        client_secret,
-        redirect_uris[0]
-    );
+        process.env.CLIENT_ID,
+        process.env.CLIENT_SECRET,
+        process.env.REDIRECT_URL
+    )
 
     const tokens = await readFile(TOKEN_PATH).catch(err => console.log(err))
     if (!Buffer.isBuffer(tokens)) return oAuth2Client
     const json = JSON.parse(tokens.toString())
-    if (!json[user.id]) return oAuth2Client
-    oAuth2Client.setCredentials(json[user.id])
+    if (json[channelId] == null) json[channelId] = {}
+    if (!json[channelId]['oAuthToken']) return oAuth2Client
+    oAuth2Client.setCredentials(json[channelId]['oAuthToken'])
 
     return oAuth2Client
+}
+
+export const saveHookData = async (channelId: string, hookId: string, token: string) => {
+    const content = await readFile(TOKEN_PATH).catch(err => console.log(err))
+    if (!(content instanceof Buffer)) return null
+    const json = JSON.parse(content.toString())
+    json[channelId]['hookId'] = hookId
+    json[channelId]['hookToken'] = token
+    await writeFile(TOKEN_PATH, JSON.stringify(json)).catch(err => console.log(err))
+}
+
+export const getWebHookClient = async (channelId: string) => {
+    const content = await readFile(TOKEN_PATH).catch(err => console.log(err))
+    if (!(content instanceof Buffer)) return null
+    const json = JSON.parse(content.toString())
+    return new WebhookClient(json[channelId]['hookId'], json[channelId]['hookToken'])
+}
+
+export const checkInit = async (channelId: string) => {
+    const content = await readFile(TOKEN_PATH).catch(err => console.log(err))
+    if (!(content instanceof Buffer)) return null
+    const json = JSON.parse(content.toString())
+    if (json[channelId] != null && json[channelId]['oAuthToken'] != null) return true
+    return false
 }
