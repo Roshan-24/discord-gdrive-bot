@@ -1,4 +1,4 @@
-import { User, WebhookClient } from 'discord.js'
+import { WebhookClient } from 'discord.js'
 import dotenv from 'dotenv'
 import { readFile, writeFile } from 'fs/promises'
 import { google } from 'googleapis'
@@ -90,6 +90,7 @@ export const getPageToken = async (channelId: string) => {
         const content = await readFile(TOKEN_PATH)
         if (!(content instanceof Buffer)) return null
         const json = JSON.parse(content.toString())
+        console.log(channelId + '\n\n\n' + json + '\n\n\n' + json[channelId])
         if (json[channelId] == null) throw new Error('Drive not initialized for channel')
         return json[channelId]['pageToken']
     } 

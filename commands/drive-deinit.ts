@@ -3,7 +3,7 @@ import { readFile, writeFile } from "fs/promises"
 import { TOKEN_PATH } from "../utils"
 
 export const name = 'drive-deinit'
-export const exectute = async (client: Client, message: Message) => {
+export const execute = async (client: Client, message: Message) => {
     try {
         const content = await readFile(TOKEN_PATH)
         if (!(content instanceof Buffer)) return null

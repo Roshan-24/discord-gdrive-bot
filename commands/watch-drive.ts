@@ -1,7 +1,7 @@
 import { Client, Message, TextChannel } from "discord.js"
 import { google } from "googleapis"
 import path from "path"
-import { getOAuth2Client, saveHookData, savePageToken, saveWatchData } from "../utils"
+import { getOAuth2Client, getWatchData, saveHookData, savePageToken, saveWatchData } from "../utils"
 
 // [prefix] !watch-drive <no.of days from expiration>
 
@@ -14,11 +14,16 @@ export const execute = async (client: Client, message: Message, args: string[]) 
         }
 
         if (args[0] == null) {
-            await message.channel.send('You need specify the number of days to watch for changes')
+            await message.channel.send('You need to specify the number of days to watch for changes')
             return
         }
 
         const id = message.channel.id
+        if (await getWatchData(id)) {
+            await message.channel.send('You are already watching for file changes')
+            return
+        }
+
         const auth = await getOAuth2Client(id)
         const drive = google.drive({version: 'v3', auth})
         const startPageToken = (await drive.changes.getStartPageToken()).data.startPageToken
@@ -45,7 +50,7 @@ export const execute = async (client: Client, message: Message, args: string[]) 
         })
         await saveHookData(message.channel.id, hook.id, hook.token)
 
-        message.channel.send(`Watching drive changes for the next ${args[0]} days`)
+        await message.channel.send(`Watching drive changes for the next ${args[0]} days`)
     } 
     catch (err) {
         message.channel.send('There was some error')

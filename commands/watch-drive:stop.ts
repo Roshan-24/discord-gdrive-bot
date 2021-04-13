@@ -20,10 +20,10 @@ export const execute = async (client: Client, message: Message) => {
                 expiration: watchData.expirationTime
             }
         })
-        await saveWatchData(null, null, message.channel.id)
-        await saveHookData(message.channel.id, null, null)
         if (res.status == 204) {
             await hook.delete()
+            await saveWatchData(null, null, message.channel.id)
+            await saveHookData(message.channel.id, null, null)
             await message.channel.send('Stopped watching changes in this channel')
         } else {
             console.log('Error boi')

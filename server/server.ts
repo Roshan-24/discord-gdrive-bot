@@ -5,7 +5,7 @@ import { google } from 'googleapis'
 
 const app = express()
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, '../../server/index.html'))
 })
 
@@ -45,4 +45,6 @@ app.post('/hook/:id', async (req, res) => {
     }
 })
 
-export default app
+app.listen(process.env.PORT, () => {
+	console.log('Server is running!')
+})
