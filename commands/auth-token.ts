@@ -5,7 +5,7 @@ import { getOAuth2Client, TOKEN_PATH } from "../utils"
 export const name = 'auth-token'
 export const execute = async (client: Client, message: Message, args: string[]) => {
     if (!(message.channel instanceof DMChannel)) {
-        message.channel.send('Do not reveal your access token in the public! Use this command in my DMs')
+        message.channel.send('Do not reveal your access token in public! Use this command in my DM')
         message.delete({ reason: 'Sensitive info shared accidentally' })
         return
     }

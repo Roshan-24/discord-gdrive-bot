@@ -1,33 +1,43 @@
 import { Client, Message, TextChannel } from "discord.js"
 import { google } from "googleapis"
 import path from "path"
-import { getOAuth2Client, saveHookData } from "../utils"
+import { getOAuth2Client, saveHookData, savePageToken, saveWatchData } from "../utils"
 
 // [prefix] !watch-drive <no.of days from expiration>
 
 export const name = 'watch-drive'
 export const execute = async (client: Client, message: Message, args: string[]) => {
-
-    if (!(message.channel instanceof TextChannel)) {
-        message.channel.send('You\'re supposed to use this command in a server\'s text channel')
-		return
-    }
-
-    const id = message.channel.id
-    const auth = await getOAuth2Client(id)
-    const drive = google.drive({version: 'v3', auth})
-    const startPageToken = (await drive.changes.getStartPageToken()).data.startPageToken
-
     try {
+        if (!(message.channel instanceof TextChannel)) {
+            await message.channel.send('You\'re supposed to use this command in a server\'s text channel')
+            return
+        }
+
+        if (args[0] == null) {
+            await message.channel.send('You need specify the number of days to watch for changes')
+            return
+        }
+
+        const id = message.channel.id
+        const auth = await getOAuth2Client(id)
+        const drive = google.drive({version: 'v3', auth})
+        const startPageToken = (await drive.changes.getStartPageToken()).data.startPageToken
+        await savePageToken(startPageToken, id)
+        const expirationTime = (Date.now() + Number(args[0])*24*3600*1000).toString()
+
         const res = await drive.changes.watch({
             pageToken: startPageToken,
             requestBody: {
+                kind: 'api#channel',
                 id: `channel-${id}`,
                 address: `https://discord-gdrive-bot.herokuapp.com/hook/${id}`,
-                expiration: (Date.now() + Number(args[0])*24*3600*1000).toString(),
+                expiration: expirationTime,
                 type: 'web_hook'
             }
         })
+
+        console.log(res)
+        await saveWatchData(res.data.resourceId, expirationTime, id)
 
         const hook = await message.channel.createWebhook('Obama', {
             avatar: path.join(__dirname, '../../obama.jpg'),

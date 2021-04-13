@@ -1,5 +1,5 @@
-import { Client, Message, TextChannel } from 'discord.js';
-import { SCOPES, getOAuth2Client, checkInit } from '../utils';
+import { Client, Message, MessageEmbed, TextChannel } from 'discord.js';
+import { SCOPES, getOAuth2Client, checkInit, prefix } from '../utils';
 
 //[prefix]drive-init
 
@@ -22,8 +22,13 @@ export const execute = async (client: Client, message: Message) => {
 			access_type: 'offline',
 			scope: SCOPES,
 		})
-		message.channel.send("Check your DMs!")
-		message.author.send(`You have initiated drive integration for channel id ${message.channel.id}. Authorize the bot by visiting this url: ${authUrl} and copy the access code and reply back in this format - '!auth-token <channel-id> <token>' (without the brackets). Caution: Don't share your access token with others`);
+		await message.channel.send("Check your DMs!")
+		await message.author.send(new MessageEmbed()
+			.setColor('#FFFF00')
+			.setTitle('Drive initialization')
+			.setDescription(`You have started drive initialization for channel id ${message.channel.id}. Authorize the bot by clicking the link above and reply back in the following format:\n ${prefix}auth-token <channelId> <authToken>\n\n Caution: Do not share your access token with anybody`)
+			.setURL(authUrl)
+		)
 	} 
 	catch (err) {
 		message.channel.send('Something went wrong...')
