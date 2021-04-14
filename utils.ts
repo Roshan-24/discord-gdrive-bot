@@ -2,6 +2,7 @@ import { WebhookClient } from 'discord.js'
 import dotenv from 'dotenv'
 import { readFile, writeFile } from 'fs/promises'
 import { google } from 'googleapis'
+import fetch from 'node-fetch'
 
 dotenv.config()
 
@@ -123,6 +124,23 @@ export const getWatchData = async (channelId: string) => {
         if (json[channelId]['resourceId'] == null || json[channelId]['expirationTime'] == null) return null
         return { resourceId: json[channelId]['resourceId'], expirationTime: json[channelId]['expirationTime'] }
     } 
+    catch (err) {
+        throw err
+    }
+}
+
+export const syncJson = async () => {
+    try {
+        const content = await readFile(TOKEN_PATH)
+        if (!(content instanceof Buffer)) throw new Error('Error while reading from json')
+        const json = JSON.parse(content.toString())
+        const res = await fetch('https://discord-gdrive-bot.herokuapp.com/syncJson', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(json)
+        }) 
+        if (res.status != 200) throw new Error(res.body.message ?? res) 
+    }
     catch (err) {
         throw err
     }

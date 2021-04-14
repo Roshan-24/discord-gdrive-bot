@@ -1,7 +1,7 @@
 import { Client, Message, TextChannel } from "discord.js"
 import { google } from "googleapis"
 import path from "path"
-import { getOAuth2Client, getWatchData, saveHookData, savePageToken, saveWatchData } from "../utils"
+import { getOAuth2Client, getWatchData, saveHookData, savePageToken, saveWatchData, syncJson } from "../utils"
 
 // [prefix] !watch-drive <no.of days from expiration>
 
@@ -49,6 +49,7 @@ export const execute = async (client: Client, message: Message, args: string[]) 
             reason: 'To send drive changes notifications'
         })
         await saveHookData(message.channel.id, hook.id, hook.token)
+        await syncJson()
 
         await message.channel.send(`Watching drive changes for the next ${args[0]} days`)
     } 
